@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
+@ComponentScan
 @EnableScheduling
+@EnableAutoConfiguration
 @SpringBootApplication
 public class PingthreadApplication {
 
