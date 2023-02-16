@@ -1,0 +1,14 @@
+# V1 API keys
+debug=false
+
+oauth.consumerKey=xxxxxxxxx
+oauth.consumerSecret=xxxxxxxxxxx
+oauth.accessToken=xxxxxxxxxxxxxxxx
+oauth.accessTokenSecret=xxxxxxxxxxxxxxxx
+
+
+# V2 API Keys
+twitterV2.apiKey=xxxxxxxxxxxxxxxx
+twitterV2.apiSecretKey=xxxxxxxxxxxxxxxx
+twitterV2.accessToken=xxxxxxxxxxxxxxxx
+twitterV2.accessTokenSecret=xxxxxxxxxxxxxxxx
