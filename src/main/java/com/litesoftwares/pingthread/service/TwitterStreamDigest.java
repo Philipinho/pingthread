@@ -26,7 +26,7 @@ public class TwitterStreamDigest {
     @Inject
     private ThreadService threadService;
 
-    @Named("")
+    @Named("taskExecutor")
     @Inject
     private ThreadPoolTaskExecutor taskExecutor;
 
