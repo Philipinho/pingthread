@@ -12,23 +12,24 @@ import twitter4j.*;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 @Service
 public class TwitterStreamDigest {
-
     private static final TwitterClient twitterV2 = TwitterUtils.twitterV2Client();
     private final Twitter twitter = TwitterFactory.getSingleton();
 
     @Inject
     private ThreadService threadService;
 
+    @Named("taskExecutor")
     @Inject
     private ThreadPoolTaskExecutor taskExecutor;
 
-    private BlockingQueue<Status> queue = new ArrayBlockingQueue<>(200);
+    private BlockingQueue<Status> queue = new ArrayBlockingQueue<>(100);
     @Value("${keyword.track}")
     private String keywordToTrack;
 
