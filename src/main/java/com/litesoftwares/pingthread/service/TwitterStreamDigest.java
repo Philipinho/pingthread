@@ -6,16 +6,13 @@ import io.github.redouane59.twitter.TwitterClient;
 import io.github.redouane59.twitter.dto.stream.StreamRules;
 import io.github.redouane59.twitter.dto.tweet.Tweet;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import twitter4j.*;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.Objects;
 
 @Service
 public class TwitterStreamDigest {
@@ -26,11 +23,6 @@ public class TwitterStreamDigest {
     @Inject
     private ThreadService threadService;
 
-    @Named("taskExecutor")
-    @Inject
-    private ThreadPoolTaskExecutor taskExecutor;
-
-    private BlockingQueue<Status> queue = new ArrayBlockingQueue<>(200);
     @Value("${keyword.track}")
     private String keywordToTrack;
 
@@ -41,19 +33,24 @@ public class TwitterStreamDigest {
 
         String botUsername = keywordToTrack;
 
-        try{
+        try {
             List<StreamRules.StreamRule> rules = twitterV2.retrieveFilteredStreamRules();
 
-            if (rules == null){
+            if (rules == null) {
                 twitterV2.addFilteredStreamRule(botUsername, "");
             } else {
                 for (StreamRules.StreamRule rule : rules) {
-                    twitterV2.deleteFilteredStreamRuleId(rule.getId());
+                    if (!Objects.equals(rule.getValue(), botUsername)) {
+                        twitterV2.deleteFilteredStreamRuleId(rule.getId());
+                        twitterV2.addFilteredStreamRule(botUsername, "");
+                    }
                 }
-                twitterV2.addFilteredStreamRule(botUsername, "");
             }
 
-        } catch (Exception e){
+            System.out.println("Stream connected to: " + botUsername);
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -65,17 +62,15 @@ public class TwitterStreamDigest {
 
             @Override
             public void onTweetStreamed(Tweet tweet) {
+                System.out.println(tweet.getId());
                 // Twitter deprecated V1 filtered streams
-                // For me not to mess the other parts of the code, I will only use v2 streams to get the tweet
+                // For us not to mess the other parts of the code, I will only use v2 streams to get the tweet
                 // then pass it to the v1 api to proceed as usual
-
                 try {
-
                     Status v1Status = twitter.showStatus(Long.parseLong(tweet.getId()));
-
-                    queue.offer(v1Status);
-                } catch (TwitterException e) {
-                    throw new RuntimeException(e);
+                    threadService.processMentions(v1Status);
+                } catch (Exception e) {
+                    System.out.println("V2 Streaming error: " + e.getMessage());
                 }
             }
 
@@ -95,16 +90,13 @@ public class TwitterStreamDigest {
     public void afterPropertiesSet() {
         try {
 
-            if(twitterProcessing) {
-                for (int i = 0; i < taskExecutor.getMaxPoolSize(); i++) {
-                    taskExecutor.execute(new TweetProcessor(threadService,queue));
-                }
+            if (twitterProcessing) {
                 run();
             }
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("What happened?");
+            System.out.println("PostConstruct error");
         }
     }
 }

@@ -29,10 +29,7 @@ public class ThreadService {
             long mentionTweetId = tweet.getId();
             String whoMentionedMe = tweet.getUser().getScreenName();
 
-            if (whoMentionedMe.equalsIgnoreCase("getvideobot")
-                    || whoMentionedMe.equalsIgnoreCase("pingthread")
-                    || whoMentionedMe.equalsIgnoreCase("savethisvideo")
-                    || whoMentionedMe.equalsIgnoreCase("savethisvideo_")){
+            if (whoMentionedMe.equalsIgnoreCase("pingthread")){
                 return;
             }
 

@@ -8,9 +8,6 @@ server.error.whitelabel.enabled=true
 
 http.auth-token-header-name=X-API
 http.auth-token=xxxxxxxxxxxxxxxxxxxxxx
-taskExecutor.corePoolSize=2
-taskExecutor.maxPoolSize=2
-taskExecutor.queueCapacity=100
 
 keyword.track=@pingthread
 twitterProcessing.enabled=true
